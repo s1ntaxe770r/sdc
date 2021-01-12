@@ -7,3 +7,5 @@ env.bak/
 env/
 venv.bak/
 env
+.vscode 
+../Fakexels/Fakexels/__pycache__
