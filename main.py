@@ -6,12 +6,23 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime
 from sqlalchemy.orm import backref
 from flask_marshmallow import Marshmallow , fields
+from utils import Init_Uploads
 from passlib.hash import bcrypt 
+from celery import make_celery
+from tasks import upload_file
 
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_FOLDER'] = 'uploads'
+CELERY_BROKER_URL='redis://localhost:6379',
+CELERY_RESULT_BACKEND='redis://localhost:6379'
+
+Init_Uploads()
+celery  = make_celery(app)
+
 
 
 db = SQLAlchemy(app)
@@ -64,6 +75,30 @@ def create_user():
         }
     )
     
+@app.route('/upload',methods=['POST'])
+async def upload():
+     if request.method == 'POST':
+
+        if 'files[]' not in request.files:
+            err_msg  = {'err':'files not found'}
+            return  jsonify(err_msg)
+
+        files = request.files.getlist('files[]')
+
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            else:
+                err_msg  = f'file {file} is not allowed'
+                err = {'err':err_msg}
+                return jsonify(err)
+
+        return "successfully uploaded file"
+
+    
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True)
