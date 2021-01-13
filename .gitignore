@@ -8,5 +8,4 @@ env/
 venv.bak/
 env
 .vscode 
-Fakexels/Fakexels/__pycache__
-Fakexels/main/__pycache__/          
+__pycache__/          
