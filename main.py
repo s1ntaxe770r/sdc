@@ -1,4 +1,6 @@
+import re
 from flask import Flask,request
+from flask import json
 from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
 import datetime
@@ -29,7 +31,7 @@ class Users(db.Model):
     @classmethod
     def hash_password(cls,password:str):
         hashed = bcrypt.hash(password)
-        return hash 
+        return str(hashed) 
     @classmethod
     def pass_verify(cls,password:str,hash:str):
         verified = bcrypt.verify(password,hash)
@@ -42,23 +44,14 @@ class Images(db.Model):
     private_image_links = db.Column(db.String(230),nullable=False)
     image_owner  = db.Column(db.Integer(),db.ForeignKey('users.id'))
 
-class UserSchema(ma.SQLAlchemySchema):
-    class Meta:
-        model= Users
-        fields = ("username","password")
-
-    username = ma.auto_field()
-    password = ma.auto_field()
-
-
 
 
 @app.route("/users/create",methods=['POST'])
 def create_user():
     form_data = request.json
-    errors = UserSchema.validate(form_data)
-    if errors:
-        return jsonify({ 'error':errors})
+    if form_data['username'] == '' and form_data['password'] == '':
+        err_message = {'error':'password and username are required to create an account'}
+        return jsonify(err_message)
     hash = Users.hash_password(form_data['password'])
     username =  form_data['username']
     new_user = Users(username=username,password=hash)
@@ -68,10 +61,12 @@ def create_user():
         {
             'username': username,
             'account_created': 'true',
-            'date': datetime.time()
         }
     )
     
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
