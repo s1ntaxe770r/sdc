@@ -28,8 +28,6 @@ Init_Uploads()
 db = SQLAlchemy(app)
 
 
-
-
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -65,6 +63,12 @@ def create_user():
         return jsonify(err_message)
     hash = Users.hash_password(form_data['password'])
     username =  form_data['username']
+    if Users.query.filter_by(username = username).first() is not None:
+        err_message  = {
+            'message':'sorry that user already exists',
+            'account_created':'false'
+        }
+        return jsonify(err_message)
     new_user = Users(username=username,password=hash)
     db.session.add(new_user)
     db.session.commit()
@@ -97,7 +101,8 @@ def upload():
             return jsonify({'uploaded':"True",'message':success_msg})
         
         return jsonify({'err':'sorry one of the files is not allowed'})
-                
+
+         
      
 
     
