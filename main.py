@@ -8,7 +8,6 @@ from sqlalchemy.orm import backref
 from flask_marshmallow import Marshmallow , fields
 from utils import Init_Uploads,allowed_file
 from passlib.hash import bcrypt 
-from celery import make_celery
 from tasks import upload_file
 from redis import Redis
 from rq import Queue
@@ -79,21 +78,22 @@ def create_user():
     )
     
 @app.route('/upload',methods=['POST'])
-async def upload():
+def upload():
+    if 'files[]' not in request.files:
+        err_msg  = {'err':'no file found in request body'}
+        return jsonify(err_msg)
 
-        if 'files[]' not in request.files:
-            err_msg  = {'err':'no file found in request body'}
-            return jsonify(err_msg)
-
-        files = request.files.getlist('files[]')
-        for file in files:
-            if file and allowed_file(file.filename):
-                q.enqueue(upload_file(file,app))
-                success_msg = 'your files would be uploaded shortly'
-                return jsonify({'uploaded':True,'message':success_msg})
-            else:
-                err_msg = f'sorry {file} is not allowed'
-                return jsonify({'err':err_msg})  
+    files = request.files.getlist('files[]')
+    print('none here either')
+    for file in files:
+        if file and allowed_file(file.filename,ALLOWED_EXTENSIONS):
+            print('files get qued')
+            q.enqueue(upload_file(file,app))
+            success_msg = 'your files would be uploaded shortly'
+            print('json failing?')
+            return jsonify({'uploaded':"True",'message':success_msg})
+        print('prob return val')
+        return jsonify({'err':'sorry one of the files is not allowed'})  
                 
      
 
