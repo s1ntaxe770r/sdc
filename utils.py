@@ -14,14 +14,6 @@ def Init_Uploads():
     if not os.path.isdir(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
 
-class Password:
- 	@classmethod
- 	def generate(cls,size=16):
- 		characters = ascii_letters  +  digits + ascii_lowercase
- 		choice = random.SystemRandom()
- 		password =  "".join(choice.choice(characters)
-                    for i in range(size))
- 		return str(password)
 
 
 def allowed_file(filename , ALLOWED_EXTENSIONS):
