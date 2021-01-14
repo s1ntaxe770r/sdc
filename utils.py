@@ -22,3 +22,7 @@ class Password:
  		password =  "".join(choice.choice(characters)
                     for i in range(size))
  		return str(password)
+
+
+def allowed_file(filename , ALLOWED_EXTENSIONS):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
