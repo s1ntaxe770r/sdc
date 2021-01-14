@@ -1,5 +1,5 @@
 import re
-from flask import Flask,request
+from flask import Flask,request,g
 from flask import json
 from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -10,6 +10,7 @@ import pathlib
 from flask.globals import request
 from werkzeug.utils import secure_filename
 import os
+from flask_httpauth import HTTPBasicAuth
 import requests
 
 
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
+auth = HTTPBasicAuth()
 ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg','webp'])
 
 
@@ -54,7 +56,17 @@ class Images(db.Model):
     image_owner  = db.Column(db.Integer(),db.ForeignKey('users.id'))
 
 
+@auth.verify_password
+def verify_password(username, password):
+    user = Users.query.filter_by(username = username).first()
+    if not user or not Users.pass_verify(password,user.password):
+        return False
+    g.user = user
+    return True
 
+
+
+# Create an account !!
 @app.route("/users/create",methods=['POST'])
 def create_user():
     form_data = request.json
@@ -79,12 +91,12 @@ def create_user():
         }
     )
  
-@app.route('public/upload',methods=['POST'])
+@app.route('/public/upload',methods=['POST'])
+@auth.login_required
 def upload():
     if 'files[]' not in request.files:
         err_msg  = {'err':'no file found in request body'}
         return jsonify(err_msg)
-
     files = request.files.getlist('files[]')
     print('none here either')
     for file in files:
