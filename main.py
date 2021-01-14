@@ -53,7 +53,7 @@ class Images(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_image_links = db.Column(db.String(230),nullable=False)
     private_image_links = db.Column(db.String(230),nullable=False)
-    image_owner  = db.Column(db.Integer(),db.ForeignKey('users.id'))
+    image_owner  = db.Column(db.Integer(),db.ForeignKey('users.username'))
 
 
 @auth.verify_password
@@ -105,7 +105,6 @@ def upload():
             secure_file , filext = os.path.splitext(secure_filename(file.filename))
             Random_Filename = Random_File.generate()
             newfilename = Random_Filename + filext
-            
             if file.save(os.path.join(app.config['UPLOAD_FOLDER'], newfilename)):
                 uploaded_files +=1
                 os.rename(secure_file,newfilename)
