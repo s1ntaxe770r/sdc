@@ -75,7 +75,7 @@ def create_user():
         }
     )
  
-@app.route('/upload',methods=['POST'])
+@app.route('public/upload',methods=['POST'])
 def upload():
     if 'files[]' not in request.files:
         err_msg  = {'err':'no file found in request body'}
