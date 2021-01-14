@@ -110,6 +110,8 @@ def upload():
                 os.rename(secure_file,newfilename)
             usr_name = auth.current_user()
             user_img = Images(public_image=secure_file,image_owner=usr_name)
+            db.session.add(user_img)
+            db.session.commit()
             success_msg = 'uploaded file(s)'
             return jsonify({'uploaded':"True",'message':success_msg})
         
