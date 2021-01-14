@@ -88,7 +88,7 @@ def upload():
     for file in files:
         if file and allowed_file(file.filename,ALLOWED_EXTENSIONS):
             print('files get qued')
-            q.enqueue(upload_file(file,app))
+            q.enqueue(upload_file,file)
             success_msg = 'your files would be uploaded shortly'
             print('json failing?')
             return jsonify({'uploaded':"True",'message':success_msg})
