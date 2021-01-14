@@ -1,2 +1,2 @@
 # CREATE user
-curl -d '{"username":"batmaan", "password":"wootwoot"}' -H "Content-Type: application/json" -X POST http://localhost:5000/users/create
+curl -d '{"username":"batman", "password":"wootwoot"}' -H "Content-Type: application/json" -X POST http://localhost:5000/users/create
