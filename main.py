@@ -51,8 +51,8 @@ class Users(db.Model):
 
 class Images(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    public_image_links = db.Column(db.String(230),nullable=False)
-    private_image_links = db.Column(db.String(230),nullable=False)
+    public_image= db.Column(db.String(230),nullable=False)
+    private_image= db.Column(db.String(230),nullable=False)
     image_owner  = db.Column(db.Integer(),db.ForeignKey('users.username'))
 
 
@@ -108,6 +108,8 @@ def upload():
             if file.save(os.path.join(app.config['UPLOAD_FOLDER'], newfilename)):
                 uploaded_files +=1
                 os.rename(secure_file,newfilename)
+            usr_name = auth.current_user()
+            user_img = Images(public_image=secure_file,image_owner=usr_name)
             success_msg = 'uploaded file(s)'
             return jsonify({'uploaded':"True",'message':success_msg})
         
