@@ -51,8 +51,8 @@ class Users(db.Model):
 
 class Images(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    public_image= db.Column(db.String(230),nullable=False)
-    private_image= db.Column(db.String(230),nullable=False)
+    public_image= db.Column(db.String(230))
+    private_image= db.Column(db.String(230))
     image_owner  = db.Column(db.Integer(),db.ForeignKey('users.username'))
 
 
@@ -109,7 +109,7 @@ def upload():
                 uploaded_files +=1
                 os.rename(secure_file,newfilename)
             usr_name = auth.current_user()
-            user_img = Images(public_image=secure_file,image_owner=usr_name)
+            user_img = Images(public_image=newfilename,image_owner=usr_name)
             db.session.add(user_img)
             db.session.commit()
             success_msg = 'uploaded file(s)'
