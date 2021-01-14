@@ -1,4 +1,3 @@
-from main import app
 from werkzeug.utils import secure_filename
 import os
 
