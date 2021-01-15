@@ -101,7 +101,6 @@ def upload_public():
         err_msg  = {'err':'no file found in request body'}
         return jsonify(err_msg)
     files = request.files.getlist('files[]')
-    print('none here either')
     for file in files:
         if file and allowed_file(file.filename,ALLOWED_EXTENSIONS):
             uploaded_files = 0 
