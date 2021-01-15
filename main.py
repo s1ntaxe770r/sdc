@@ -127,9 +127,9 @@ def get_images():
    public_images = {'Images':image_list} 
    return  jsonify(public_images)
 
-@app.route('/image/<path:path>')
-def send_image(path):
-    return send_from_directory('uploads', path)
+@app.route('/image/<path:filename>')
+def send_image(filename):
+    return send_from_directory('uploads', filename)
 
     
     
