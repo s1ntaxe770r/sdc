@@ -11,8 +11,11 @@ def hash_password(password:str):
 def Init_Uploads():
     path = os.getcwd()
     UPLOAD_FOLDER = os.path.join(path, 'uploads')
-    if not os.path.isdir(UPLOAD_FOLDER):
-        os.mkdir(UPLOAD_FOLDER)
+    PRIVATE_FOLDER =os.path.join(path, 'private')
+    if not os.path.isdir(UPLOAD_FOLDER) and os.path.isdir(PRIVATE_FOLDER):
+        os.makedir(UPLOAD_FOLDER)
+        os.makedir(PRIVATE_FOLDER)
+
 
 class Random_File:
  	@classmethod
