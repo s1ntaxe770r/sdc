@@ -154,12 +154,25 @@ def upload_private():
 
 
 
-@app.route('/images/all')
+@app.route('/public/images')
 def get_images():
    images  = db.session.query(Images.public_image).all()
    image_list = list(chain.from_iterable(images))
    public_images = {'Images':image_list} 
    return  jsonify(public_images)
+
+@app.route('/private/images')
+@auth.login_required
+def get_private_images():
+   username =  usr_name = auth.current_user()
+   images  = db.session.query(Images.private_image).filter(Images.image_owner==username).all()
+   image_list = list(chain.from_iterable(images))   
+   public_images = {'Images':image_list} 
+   return  jsonify(public_images)
+
+
+
+
 
 @app.route('/image/<path:filename>')
 def send_image(filename):
