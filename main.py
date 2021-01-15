@@ -1,5 +1,5 @@
 import re
-from flask import Flask,request,g
+from flask import Flask,request,g,send_from_directory
 from flask import json
 from flask.json import jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -16,7 +16,7 @@ import requests
 
 
 
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='/images',static_folder='uploads')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -120,12 +120,16 @@ def upload():
         return jsonify({'err':'sorry one of the files is not allowed'})
 
 
-@app.route('/images')
+@app.route('/images/all')
 def get_images():
    images  = db.session.query(Images.public_image).all()
    image_list = list(chain.from_iterable(images))
    public_images = {'Images':image_list} 
    return  jsonify(public_images)
+
+@app.route('/image/<path:path>')
+def send_image(path):
+    return send_from_directory('uploads', path)
 
     
     
