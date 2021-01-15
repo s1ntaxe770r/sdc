@@ -31,7 +31,9 @@ ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg','webp'])
 Init_Uploads()
 
 db = SQLAlchemy(app)
-
+db.init_app(app)
+db.drop_all()
+db.create_all()
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,6 +100,7 @@ def create_user():
 @auth.login_required
 def upload_public():
     if 'files[]' not in request.files:
+        uploaded_files = []
         err_msg  = {'err':'no file found in request body'}
         return jsonify(err_msg)
     files = request.files.getlist('files[]')
@@ -114,8 +117,9 @@ def upload_public():
             user_img = Images(public_image=newfilename,image_owner=usr_name)
             db.session.add(user_img)
             db.session.commit()
-            success_msg = 'uploaded file(s)'
-            return jsonify({'uploaded':"True",'message':success_msg})
+            uploaded_files.append(newfilename)
+            success_msg = f'uploaded {len(uploaded_files)} file(s)'
+            return jsonify({'uploaded':"True",'message':success_msg,'uploaded_files':uploaded_files})
         
         return jsonify({'err':'sorry one of the files is not allowed'})
 
@@ -168,8 +172,6 @@ def get_private_images():
    image_list = list(chain.from_iterable(images))   
    public_images = {'Images':image_list} 
    return  jsonify(public_images)
-
-
 
 
 
