@@ -9,6 +9,7 @@ from passlib.hash import bcrypt
 import pathlib
 from flask.globals import request
 from werkzeug.utils import secure_filename
+from itertools import chain
 import os
 from flask_httpauth import HTTPBasicAuth
 import requests
@@ -17,6 +18,7 @@ import requests
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
 auth = HTTPBasicAuth()
@@ -117,8 +119,13 @@ def upload():
         
         return jsonify({'err':'sorry one of the files is not allowed'})
 
-         
-     
+
+@app.route('/images')
+def get_images():
+   images  = db.session.query(Images.public_image).all()
+   image_list = list(chain.from_iterable(images))
+   public_images = {'Images':image_list} 
+   return  jsonify(public_images)
 
     
     
