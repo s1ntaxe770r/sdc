@@ -21,6 +21,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['PRIVATE_UPLOAD_FOLDER'] = 'private'
 auth = HTTPBasicAuth()
 ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg','webp'])
 
@@ -95,7 +96,7 @@ def create_user():
  
 @app.route('/public/upload',methods=['POST'])
 @auth.login_required
-def upload():
+def upload_public():
     if 'files[]' not in request.files:
         err_msg  = {'err':'no file found in request body'}
         return jsonify(err_msg)
@@ -118,6 +119,39 @@ def upload():
             return jsonify({'uploaded':"True",'message':success_msg})
         
         return jsonify({'err':'sorry one of the files is not allowed'})
+
+
+@app.route('/private/upload',methods=['POST'])
+@auth.login_required
+def upload_private():
+    if 'files[]' not in request.files:
+        err_msg  = {'err':'no file found in request body'}
+        return jsonify(err_msg)
+    files = request.files.getlist('files[]')
+    print('none here either')
+    for file in files:
+        uploaded_files = []
+        if file and allowed_file(file.filename,ALLOWED_EXTENSIONS):
+            secure_file , filext = os.path.splitext(secure_filename(file.filename))
+            Random_Filename = Random_File.generate()
+            newfilename = Random_Filename + filext
+            if file.save(os.path.join(app.config['PRIVATE_UPLOAD_FOLDER'], newfilename)):
+                os.rename(secure_file,newfilename)
+            usr_name = auth.current_user()
+            user_img = Images(private_image=newfilename,image_owner=usr_name)
+            uploaded_files.append(newfilename)
+            db.session.add(user_img)
+            db.session.commit()
+            success_msg = f'uploaded {len(uploaded_files)} file(s)'
+            return jsonify({'uploaded':"True",'message':success_msg,'uploaded_files':uploaded_files})
+        
+        return jsonify({'err':'sorry one of the files is not allowed'})
+
+
+
+
+
+
 
 
 @app.route('/images/all')
