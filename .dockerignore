@@ -1,0 +1,7 @@
+*.db
+curl.txt
+.vscode 
+env/
+.gitignore 
+private/
+uploads/
