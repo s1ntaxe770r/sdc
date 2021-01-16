@@ -10,3 +10,4 @@ env
 .vscode 
 __pycache__/         
 uploads/
+.DS_Store
