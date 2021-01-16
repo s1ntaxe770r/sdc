@@ -100,18 +100,17 @@ def create_user():
 @auth.login_required
 def upload_public():
     if 'files[]' not in request.files:
-        uploaded_files = []
+      
         err_msg  = {'err':'no file found in request body'}
         return jsonify(err_msg)
     files = request.files.getlist('files[]')
     for file in files:
+        uploaded_files = []
         if file and allowed_file(file.filename,ALLOWED_EXTENSIONS):
-            uploaded_files = 0 
             secure_file , filext = os.path.splitext(secure_filename(file.filename))
             Random_Filename = Random_File.generate()
             newfilename = Random_Filename + filext
             if file.save(os.path.join(app.config['UPLOAD_FOLDER'], newfilename)):
-                uploaded_files +=1
                 os.rename(secure_file,newfilename)
             usr_name = auth.current_user()
             user_img = Images(public_image=newfilename,image_owner=usr_name)
